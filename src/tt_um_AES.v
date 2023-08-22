@@ -8,11 +8,11 @@ module tt_um_AES(input wire ena,
             output wire [7:0] uio_oe
             );
 
-wire [127:0] in;
+wire [127:0] in = 128'h_00112233445566778899aabbccddeeff;
 
 // The plain text used as input
-wire[119:0] fixed_in = 120'h_00112233445566778899aabbccddee;
-assign in = {fixed_in, ui_in[7:0]};
+//wire[119:0] fixed_in = 120'h_00112233445566778899aabbccddee;
+//assign in = {fixed_in, ui_in[7:0]};
 
 // The different keys used for testing (one of each type)
 wire[127:0] key128 = 128'h_000102030405060708090a0b0c0d0e0f;
