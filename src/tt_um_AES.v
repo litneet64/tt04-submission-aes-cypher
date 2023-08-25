@@ -26,4 +26,10 @@ AES_Decrypt a2(encrypted128,key128,decrypted128);
 
 assign uo_out[7:0] = encrypted128[127:120];
 
+assign uio_oe = 8'b1111_1111;
+
+assign uio_out = 8'd0;
+
+
+
 endmodule
