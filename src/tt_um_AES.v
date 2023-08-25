@@ -12,7 +12,7 @@ module tt_um_AES(
 wire [127:0] in;
 wire [119:0] fixed_in = 120'h00112233445566778899aabbccddee;
 
-in = {fixed_in, ui_in};
+assign in = {fixed_in, ui_in[7:0]};
 
 // The plain text used as input
 //wire[119:0] fixed_in = 120'h_00112233445566778899aabbccddee;
