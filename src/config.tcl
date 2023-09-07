@@ -36,6 +36,8 @@ set ::env(GRT_ALLOW_CONGESTION) "1"
 set ::env(FP_IO_HLENGTH) 2
 set ::env(FP_IO_VLENGTH) 2
 
+set ::env(PL_TARGET_DENSITY) 0.90
+
 # use alternative efabless decap cells to solve LI density issue
 set ::env(DECAP_CELL) "\
     sky130_fd_sc_hd__decap_3 \
