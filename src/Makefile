@@ -9,7 +9,7 @@ TOPLEVEL_LANG ?= verilog
 ifneq ($(GATES),yes)
 
 # this is the only part you should need to modify:
-VERILOG_SOURCES += $(PWD)/tb.v $(PWD)/tt_um_seven_segment_seconds.v $(PWD)/decoder.v
+VERILOG_SOURCES += $(PWD)/aes_data_path.v $(PWD)/key_expansion.v $(PWD)/mux.v $(PWD)/tt_um_AES.v $(PWD)/byte_permutation_unit.v $(PWD)/parallel_serial_converter.v $(PWD)/mixcolumn.v $(PWD)/sbox_case_4.v $(PWD)/tt_um_AES_tb.v
 
 else
 
