@@ -1,50 +1,295 @@
-module AES(enable, e128, d128, e192, d192, e256, d256);
+module tt_um_AES(
+    input  wire [7:0] ui_in,    // Dedicated inputs
+    output wire [7:0] uo_out,   // Dedicated outputs
+    input  wire [7:0] uio_in,   // IOs: Input path
+    output wire [7:0] uio_out,  // IOs: Output path
+    output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
+    input  wire       ena,      // will go high when the design is enabled
+    input  wire       clk,      // clock
+    input  wire       rst_n     // reset_n - low to reset
+);
 
-output wire e128;
-output wire d128;
-output wire e192;
-output wire d192;
-output wire e256;
-output wire d256;
-input enable;
+    wire rst;
 
-// The plain text used as input
-wire[127:0] in = 128'h_00112233445566778899aabbccddeeff;
+    assign rst= ~rst_n;
+    assign uio_oe = 8'b00000000; //todos input
+    assign uio_out = 8'b00000000;
+        
+    reg d_vld;
 
-// The different keys used for testing (one of each type)
-wire[127:0] key128 = 128'h_000102030405060708090a0b0c0d0e0f;
-wire[191:0] key192 = 192'h_000102030405060708090a0b0c0d0e0f1011121314151617;
-wire[255:0] key256 = 256'h_000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f;
+    //key scheduler controller
+    wire [3:0] round_cnt_w;
+    reg input_sel, sbox_sel, last_out_sel, bit_out_sel;
+    reg [7:0] rcon_en;
+    reg [3:0] cnt;
+    reg [7:0] round_cnt;
+    reg [2:0] state;
+    wire [7:0] rk_delayed_out, rk_last_out;
+    reg [1:0] c3;
+    wire pld;
+    reg [7:0] mc_en_reg;
+    reg pld_reg;
+    wire [7:0] mc_en;
+    reg [7:0] d_out;
+    wire [7:0] d_out_w;
+    
+    reg [7:0] d_out_w_2;
+    always @ (posedge clk)
+    begin
+        d_out_w_2 <= d_out_w;
+    end
 
-// The expected outputs from the encryption module
-wire[127:0] expected128 = 128'h_69c4e0d86a7b0430d8cdb78070b4c55a;
-wire[127:0] expected192 = 128'h_dda97ca4864cdfe06eaf70a0ec0d7191;
-wire[127:0] expected256 = 128'h_8ea2b7ca516745bfeafc49904b496089;
+    always @ (posedge clk)
+    begin
+        if(d_vld) begin
+            d_out <= d_out_w_2;
+        end
+        else begin
+            d_out <= 8'd0;
+        end
+    end
 
-// The result of the encryption module for every type
-wire[127:0] encrypted128;
-wire[127:0] encrypted192;
-wire[127:0] encrypted256;
+    assign pld = pld_reg;
+    assign mc_en = mc_en_reg;
+    assign round_cnt_w = round_cnt[7:4];
 
-assign e128 = (encrypted128 == expected128 && enable) ? 1'b1 : 1'b0;
-assign e192 = (encrypted192 == expected192 && enable) ? 1'b1 : 1'b0;
-assign e256 = (encrypted256 == expected256 && enable) ? 1'b1 : 1'b0;
+    key_expansion key (uio_in, rk_delayed_out, round_cnt_w, rk_last_out, clk, input_sel, sbox_sel, last_out_sel, bit_out_sel, rcon_en);
+    aes_data_path data_path (ui_in, d_out_w, pld, c3, clk, mc_en, rk_delayed_out, rk_last_out);
 
-// The result of the decryption module for every type
-wire[127:0] decrypted128;
-wire[127:0] decrypted192;
-wire[127:0] decrypted256;
+    parameter load = 3'h0; //load 16 byte
+    parameter b1st = 3'h1; //first byte need rcon
+    parameter b2nd = 3'h2; //2byte go through sbox
+    parameter b3rd = 3'h3; //last byte go through sbox from redundant register
+    parameter norm = 3'h4; //normal round calculate two columns
+    parameter shif = 3'h5; //shift 4 byte 
 
-AES_Encrypt a(in,key128,encrypted128);
-AES_Encrypt #(192,12,6) b(in,key192,encrypted192);
-AES_Encrypt #(256,14,8) c(in,key256,encrypted256);
+    //state machine for key schedule
+    always @ (posedge clk)
+    begin
+        if (rst == 1'b1)
+        begin
+            state <= load;
+            cnt <= 4'h0;
+        end
+        else
+        begin
+            case (state)
+                load: 
+                begin
+                    cnt <= cnt + 4'h1;
+                    if (cnt == 4'hf)
+                    begin
+                        state <= b1st;
+                        cnt <= 4'h0;
+                    end
+                end
 
-AES_Decrypt a2(encrypted128,key128,decrypted128);
-AES_Decrypt #(192,12,6) b2(encrypted192,key192,decrypted192);
-AES_Decrypt #(256,14,8) c2(encrypted256,key256,decrypted256);
+                b1st:
+                begin
+                    state <= b2nd;
+                    cnt <= 4'h0;
+                end
 
-assign d128 = (decrypted128 == in && enable) ? 1'b1 : 1'b0;
-assign d192 = (decrypted192 == in && enable) ? 1'b1 : 1'b0;
-assign d256 = (decrypted256 == in && enable) ? 1'b1 : 1'b0;
+                b2nd:
+                begin
+                    cnt <= cnt + 4'h1;
+                    if (cnt == 4'h1)
+                    begin
+                        state <= b3rd;
+                        cnt <= 4'h0;
+                    end
+                end
+                
+                b3rd:
+                begin
+                    state <= norm;
+                    cnt <= 4'h0;
+                end
 
+                norm: 
+                begin
+                    cnt <= cnt + 4'h1;
+                    if(cnt == 4'h7)
+                    begin
+                        state <= shif;
+                        cnt <= 4'h0;
+                    end
+                end
+
+                shif:
+                begin
+                    cnt <= cnt + 4'h1;
+                    if(cnt == 4'h3)
+                    begin
+                        state <= b1st;
+                        cnt <= 4'h0;
+                    end
+                end
+            endcase
+        end
+    end
+
+    //mux select and rcon enable for key schedule
+    always @ (*)
+    begin
+        case(state)
+            load: 
+            begin
+                input_sel <= 1'b0;
+                sbox_sel <= 1'b1;
+                last_out_sel <= 1'b0;
+                bit_out_sel <= 1'b0;
+                rcon_en <= 8'h00;
+            end
+
+            b1st:
+            begin
+                input_sel <= 1'b1;
+                sbox_sel <= 1'b1;
+                last_out_sel <= 1'b0;
+                bit_out_sel <= 1'b1;
+                rcon_en <= 8'hFF;
+            end
+                 
+            b2nd:
+            begin
+                input_sel <= 1'b1;
+                sbox_sel <= 1'b1;
+                last_out_sel <= 1'b0;
+                bit_out_sel <= 1'b1;
+                rcon_en <= 8'h00;
+            end
+
+            b3rd:
+            begin
+                input_sel <= 1'b1;
+                sbox_sel <= 1'b0;
+                last_out_sel <= 1'b0;
+                bit_out_sel <= 1'b1;
+                rcon_en <= 8'h00;
+            end
+
+            norm:
+            begin
+                input_sel <= 1'b1;
+                sbox_sel <= 1'b0;
+                last_out_sel <= 1'b1;
+                bit_out_sel <= 1'b1;
+                rcon_en <= 8'h00;
+            end
+
+            shif:
+            begin
+                input_sel <= 1'b1;
+                sbox_sel <= 1'b0;
+                last_out_sel <= 1'b1;
+                bit_out_sel <= 1'b0;
+                rcon_en <= 8'h00;
+            end
+
+            default: 
+            begin
+                input_sel <= 1'b0;
+                sbox_sel <= 1'b1;
+                last_out_sel <= 1'b0;
+                bit_out_sel <= 1'b0;
+                rcon_en <= 8'h00;
+            end
+        endcase
+    end
+
+    //round counter
+    always @ (posedge clk)
+    begin
+        if (rst == 1'b1 || cnt == 4'hf || round_cnt_w == 4'ha)
+        begin
+            round_cnt <= 6'h00;
+        end
+        else
+        begin
+            round_cnt <= round_cnt + 6'h01;
+        end
+    end
+
+
+   
+    //state machine shift row
+    always @ (posedge clk)
+    begin
+        if (state == load) 
+        begin
+            c3 <= 2'h3;
+        end
+        else
+        begin
+            case (round_cnt[3:0])
+                4'h0: c3 <= 2'h2;
+                4'h1: c3 <= 2'h1;
+                4'h2: c3 <= 2'h0;
+                4'h3: c3 <= 2'h3;
+                4'h4: c3 <= 2'h2;
+                4'h5: c3 <= 2'h1;
+                4'h6: c3 <= 2'h1;
+                4'h7: c3 <= 2'h3;
+                4'h8: c3 <= 2'h2;
+                4'h9: c3 <= 2'h3;
+                4'hA: c3 <= 2'h2;
+                4'hB: c3 <= 2'h3;
+                4'hC: c3 <= 2'h3;
+                4'hD: c3 <= 2'h3;
+                4'hE: c3 <= 2'h3;
+                4'hF: c3 <= 2'h3;
+            endcase
+        end
+    end
+
+    //mixcoloumn enable
+    always @ (posedge clk)
+    begin
+        if (round_cnt[1:0] == 2'b11)
+        begin
+            mc_en_reg <= 8'h00;
+        end
+        else
+        begin
+            mc_en_reg <= 8'hFF;
+        end
+    end
+
+    //parelle load
+    always @ (posedge clk)
+    begin
+        if (state == load)
+        begin
+            pld_reg <= 1'b0;
+        end
+        else
+        begin
+            if (round_cnt[1:0] == 2'b11)
+            begin
+                pld_reg <= 1'b1;
+            end
+            else
+            begin
+                pld_reg <= 1'b0;
+            end
+        end
+    end
+
+    always @(posedge clk)
+    begin
+        if (rst == 1'b1)
+        begin
+            d_vld <= 1'b0;
+        end
+        else
+        begin
+            if (round_cnt == 8'h90)
+            begin
+                d_vld <= 1'b1;
+            end
+        end
+    end
+    
+    assign uo_out= d_out;
 endmodule

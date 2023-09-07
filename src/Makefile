@@ -9,7 +9,7 @@ TOPLEVEL_LANG ?= verilog
 ifneq ($(GATES),yes)
 
 # this is the only part you should need to modify:
-VERILOG_SOURCES += $(PWD)/addRoundKey_tb.v $(PWD)/AES_Encrypt.v $(PWD)/inverseMixColumns.v $(PWD)/inverseSubBytes.v $(PWD)/mixColumns.v $(PWD)/subBytes.v $(PWD)/addRoundKey.v $(PWD)/inverseSbox.v $(PWD)/keyExpansion_tb.v $(PWD)/sbox.v $(PWD)/AES_Decrypt_tb.v $(PWD)/decryptRound.v $(PWD)/inverseShiftRows_tb.v $(PWD)/keyExpansion.v $(PWD)/shiftRows_tb.v $(PWD)/tt_um_AES_tb.v $(PWD)/AES_Decrypt.v $(PWD)/encryptRound.v $(PWD)/inverseShiftRows.v $(PWD)/MakefileshiftRows.v $(PWD)/tt_um_AES.v $(PWD)/AES_Encrypt_tb.v $(PWD)/inverseMixColumns_tb.v $(PWD)/inverseSubBytes_tb.v $(PWD)/mixColumns_tb.v $(PWD)/subBytes_tb.v
+VERILOG_SOURCES += $(PWD)/tb.v $(PWD)/tt_um_seven_segment_seconds.v $(PWD)/decoder.v
 
 else
 
