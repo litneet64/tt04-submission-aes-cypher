@@ -17,7 +17,7 @@ project:
   top_module:  "tt_um_AES"      # Put the name of your top module here, must start with "tt_um_". Make it unique by including your github username
 
 # How many tiles your design occupies? A single tile is about 167x108 uM.
-  tiles: "1x2"    # Valid values: 1x1, 1x2, 2x2, 4x2 or 8x2
+  tiles: "1x1"    # Valid values: 1x1, 1x2, 2x2, 4x2 or 8x2
 
 # Keep a track of the submission yaml
 yaml_version: 4
@@ -28,13 +28,13 @@ yaml_version: 4
 # Here is a great example: https://github.com/davidsiaw/tt02-davidsiaw-stackcalc/blob/38c5647f83aad2aec675d566aa3d67b98f0aac81/info.yaml
 documentation: 
   author:       "Shawn Rodrigues & Pablo Aravena"      # Your name
-  title:        "AES-128"      # Project title
+  title:        "AES-128 in ECB mode"      # Project title
   language:     "Verilog" # other examples include Verilog, Amaranth, VHDL, etc
-  description:  ""      # Short description of what your project does
+  description:  "AES-128 cypher encryption algorithm in ECB mode, implemented in hardware using a HDL. Mostly based from the 8-bit repo 'https://github.com/ChengluJin/8bit_datapath_AES/tree/master/AES128' with minor changes in order to work in TinyTapeout."      # Short description of what your project does
 
 # Longer description of how the project works. You can use standard markdown format.
   how_it_works: |
-      Explain how your project works
+      At first, both the input and key has to be given in a byte-to-byte fashion, with the data being sent via the dedicated input pins (ui_in), and the key via the input-output pins (uio_in) on each positive clock rise. The inputted data is processed as its being received, and an internal counter is used for checking when all bytes have been encrypted. Note however, that junk data will be sent from the very first moment, so a designated pin () is used for flagging when the output becomes the real encrypted data. This detail is something the user has to take into account when testing functionality. The used mode for encrypting a 128-bit block is ECB for simplicity, so no IV is required.
 
 # Instructions on how someone could test your project, include things like what buttons do what and how to set the clock if needed
   how_to_test:  |
@@ -72,9 +72,9 @@ documentation:
     - none
 
 # The following fields are optional
-  tag:          ""      # comma separated list of tags: test, encryption, experiment, clock, animation, utility, industrial, pwm, fpga, alu, microprocessor, risc, riscv, sensor, signal generator, fft, filter, music, bcd, sound, serial, timer, random number generator, calculator, decoder, counter, puzzle, multiplier, game, oscillator,
+  tag:          "encryption,clock,utility"      # comma separated list of tags: test, encryption, experiment, clock, animation, utility, industrial, pwm, fpga, alu, microprocessor, risc, riscv, sensor, signal generator, fft, filter, music, bcd, sound, serial, timer, random number generator, calculator, decoder, counter, puzzle, multiplier, game, oscillator,
   external_hw:  ""      # Describe any external hardware needed
-  discord:      ""      # Your discord handle, used for communication and automatically assigning tapeout role after a submission
+  discord:      "litneet64#"      # Your discord handle, used for communication and automatically assigning tapeout role after a submission
   doc_link:     ""      # URL to longer form documentation, eg the README.md in your repository
   clock_hz:     0       # Clock frequency in Hz (if required)
   picture:      ""      # relative path to a picture in your repository (must be 512kb or less)

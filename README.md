@@ -1,14 +1,18 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/wokwi_test/badge.svg)
 
-# What is Tiny Tapeout?
+# AES-128 Cypher with ECB-mode
 
-TinyTapeout is an educational project that aims to make it easier and cheaper than ever to get your digital designs manufactured on a real chip!
+> &copy; 2023 Tutor Nelson Salvador, students Shawn Rodrigues and Pablo Aravena, Advanced Center for Electrical and Electronic Engeneering ([AC3E](http://ac3e.usm.cl/)), Universidad Tecnica Federico Santa Maria ([USM](https://usm.cl/)), Valparaiso, Chile
 
-Go to https://tinytapeout.com for instructions!
 
-## How to change the Wokwi project
+![](./img/aes_hla_encryption.jpg)
 
-Edit the [info.yaml](info.yaml) and change the wokwi_id to match your project.
+# Description
+
+AES is a symmetric encryption standard handling 128-bit data blocks and key sizes of 128, 192, or 256 bits. It employs rounds of operations including SubBytes, ShiftRows, MixColumns, and AddRoundKey, and has various hardware implementations in ASICs and FPGAs, with design strategies focusing on low power, compactness, and key size flexibility. One approach uses 8-bit data paths and parallel operations to reduce cycle counts. The AES core consists of 
+components like byte permutation, MixColumns, S-boxes (duplicated), and key expansion. Overall, AES is versatile and adaptable for different hardware contexts.
+
+The project is based on on ChengluJin's github on "8-bit_datapath_AES", where AES-128 is used in ECB-mode only for the encryption part, with some modifications in order to work with the expected IOs and format for TinyTapeout. In this version of the AES implementation, both inputs (key and data) are entered byte-to-byte on each clock-rise, and junk bytes of data are sent to the output until a flag is set on the output pins, which signal the starting point of the encrypted data.
 
 ## How to enable the GitHub actions to build the ASIC files
 
