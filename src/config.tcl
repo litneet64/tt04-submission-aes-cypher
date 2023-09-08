@@ -38,7 +38,7 @@ set ::env(FP_IO_VLENGTH) 2
 
 # custom optimizations 
 set ::env(PL_TARGET_DENSITY) 0.6
-set ::env(SYNTH_STRATEGY) "AREA 3"
+#set ::env(SYNTH_STRATEGY) "AREA 3"
 
 # use alternative efabless decap cells to solve LI density issue
 set ::env(DECAP_CELL) "\
@@ -55,8 +55,8 @@ set ::env(RUN_CTS) 1
 #set ::env(CLOCK_PORT) {clk}
 
 # hold/slack margin
-set ::env(PL_RESIZER_HOLD_SLACK_MARGIN) 0.9
-set ::env(GLB_RESIZER_HOLD_SLACK_MARGIN) 0.9
+#set ::env(PL_RESIZER_HOLD_SLACK_MARGIN) 0.9
+#set ::env(GLB_RESIZER_HOLD_SLACK_MARGIN) 0.9
 
 # don't use power rings or met5
 set ::env(DESIGN_IS_CORE) 0
