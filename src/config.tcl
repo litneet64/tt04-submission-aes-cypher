@@ -37,8 +37,8 @@ set ::env(FP_IO_HLENGTH) 2
 set ::env(FP_IO_VLENGTH) 2
 
 # custom optimizations 
-set ::env(PL_TARGET_DENSITY) 0.88
-set ::env(SYNTH_STRATEGY) "AREA 1"
+set ::env(PL_TARGET_DENSITY) 0.6
+set ::env(SYNTH_STRATEGY) "AREA 3"
 
 # use alternative efabless decap cells to solve LI density issue
 set ::env(DECAP_CELL) "\
@@ -51,8 +51,8 @@ set ::env(DECAP_CELL) "\
 # clock
 set ::env(RUN_CTS) 1
 # period is in ns, so 20ns == 50mHz
-set ::env(CLOCK_PERIOD) "20"
-set ::env(CLOCK_PORT) {clk}
+#set ::env(CLOCK_PERIOD) "20"
+#set ::env(CLOCK_PORT) {clk}
 
 # hold/slack margin
 set ::env(PL_RESIZER_HOLD_SLACK_MARGIN) 0.9
