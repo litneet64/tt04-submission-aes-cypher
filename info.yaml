@@ -34,18 +34,18 @@ documentation:
 
 # Longer description of how the project works. You can use standard markdown format.
   how_it_works: |
-      This implementation receives both the input and key in a byte-for-byte fashion, with the data being sent via the dedicated input pins (ui_in), and the key being sent via the input-output pins (uio_in) on each positive clock rise. The input data is processed as its being received and sent out at the next clock-cycle, and an internal counter is used for checking when all bytes have been encrypted in order to send out the correct encrypted bytes. This means that null-bytes will be sent from the very first cycle on the output pins, and the user has to record the consecutive N bytes since something besides null bytes comes out from the first 8 uo_out pins. 
+      This implementation receives both the input and key in a byte-for-byte fashion, with the data being sent via the dedicated input pins (ui_in), and the key being sent via the input-output pins (uio_in) on each positive clock rise. The input data is processed as its being received and sent out at the next clock-cycle, and an internal counter is used for checking when all bytes have been encrypted in order to send out the correct encrypted bytes. This means that null-bytes will be sent from the very first cycle on the output pins, and the user has to record the consecutive N bytes since something besides null bytes comes out from the first 8 output (uo_out) pins. 
       
-      The internal workings for this project consist of a 4x4 byte matrix that holds the current state, and where all operations are performed on. The main components for this implementation consist on a "byte permutation unit", a "MixColumns multiplier", a "parallel-to-serial converter", two "S-box units", and a "key expansion unit", which process the inputs on a linear, on-the-fly fashion, thus requiring less cells for it to encrypt data.
+      The internal workings for this project consist of a 4x4 byte matrix that holds the current state, and it's where all operations are performed on. The main components for this implementation consist on a "byte permutation unit", a "MixColumns multiplier", a "parallel-to-serial converter", two "S-box units", and a "key expansion unit", which process the inputs on a linear, on-the-fly fashion, thus requiring less cells for it to correctly encrypt data.
 
 # Instructions on how someone could test your project, include things like what buttons do what and how to set the clock if needed
   how_to_test:  |
-      You can test this project searching for an already known AES-128 software-based implementation, like the one found in CyberChef, and comparing the expected outputs with the same 16-byte key. The used mode for encrypting a 128-bit block is ECB (without null-padding) for simplicity, so no IV is required. Note there's a special case when the expected output (encrypted data) starts with a null byte. In order to verifying when this special case is reached, the user can check that the encrypted data length matches with the closest multiple of 16. More details for handling these special cases can be found on our repository README.
-      
+      You can test this project searching for an already known AES-128 software-based implementation, like the one found in CyberChef, and comparing the expected outputs with the same 16-byte key. The used mode for encrypting a 128-bit block is ECB (without null-padding) for simplicity, so no IV is required. Note there's a special case when the expected output (encrypted data) starts with a null byte. In order to verify when this special case is reached, the user can check that the encrypted data length matches with the closest multiple of 16 (ceiling). More details for handling these special cases can be found on our repository README.
+
 
 # A description of what the inputs do (e.g. red button, SPI CLK, SPI MOSI, etc).
   inputs:               
-    - ui_in[7:0]: data to encrypt will be sent through this pin, grouped on 8-bits at a clock cycle.
+    - ui_in[7:0]: the data to encrypt will be sent through this pin, grouped on 8-bits at a clock cycle.
 
 # A description of what the outputs do (e.g. status LED, SPI MISO, etc)
   outputs:
@@ -53,7 +53,7 @@ documentation:
 
 # A description of what the bidirectional I/O pins do (e.g. I2C SDA, I2C SCL, etc)
   bidirectional:
-    - uio_in[7:0]: the key will be sent through this pin, grouped on 8-bits at a clock cycle. Size for key has to be of 16 bytes
+    - uio_in[7:0]: the key will be sent through this pin, grouped on 8-bits at a clock cycle. Size for the key has to be of 16 bytes.
 
 # The following fields are optional
   tag:          "encryption,clock,industrial"      # comma separated list of tags: test, encryption, experiment, clock, animation, utility, industrial, pwm, fpga, alu, microprocessor, risc, riscv, sensor, signal generator, fft, filter, music, bcd, sound, serial, timer, random number generator, calculator, decoder, counter, puzzle, multiplier, game, oscillator,

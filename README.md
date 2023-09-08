@@ -12,7 +12,7 @@
 AES is a symmetric encryption standard handling 128-bit data blocks and key sizes of 128, 192, or 256 bits. It employs rounds of operations including SubBytes, ShiftRows, MixColumns, and AddRoundKey, and has various hardware implementations in ASICs and FPGAs, with design strategies focusing on low power, compactness, and key size flexibility. One approach uses 8-bit data paths and parallel operations to reduce cycle counts. The AES core consists of 
 components like byte permutation, MixColumns, S-boxes (duplicated), and key expansion. Overall, AES is versatile and adaptable for different hardware contexts.
 
-The project is based on on ChengluJin's github on "8-bit_datapath_AES", where AES-128 is used in ECB-mode only for the encryption part, with some modifications in order to work with the expected IOs and format for TinyTapeout. In this version of the AES implementation, both inputs (key and data) are entered byte-to-byte on each clock-rise, and junk bytes of data are sent to the output until a flag is set on the output pins, which signal the starting point of the encrypted data.
+The project is based on on ChengluJin's github on "8-bit_datapath_AES", where AES-128 is used in ECB-mode only for the encryption part, with some modifications in order to work with the expected IOs and format for TinyTapeout. In this version of the AES implementation, both inputs (key and data) are entered byte-to-byte on each clock-rise, and null bytes of data are sent to the output until a flag is set internally in order to drive the output pins with the encrypted data.
 
 ## How to enable the GitHub actions to build the ASIC files
 
