@@ -37,7 +37,7 @@ set ::env(FP_IO_HLENGTH) 2
 set ::env(FP_IO_VLENGTH) 2
 
 #set ::env(PL_TARGET_DENSITY) 0.90
-set ::env(SYNTH_STRATEGY) "AREA 3"
+set ::env(SYNTH_STRATEGY) "AREA 2"
 
 # use alternative efabless decap cells to solve LI density issue
 set ::env(DECAP_CELL) "\
